@@ -56,8 +56,9 @@ func main() {
 // }
 
 func ParseInput(input string) []string {
+	text := strings.ReplaceAll(input, "\\n", "\n")
 
-	words := strings.Split(strings.ReplaceAll(input, "\r\n", "\n"), "\r\n")
+	words := strings.Split(text, "\n")
 
 	return words
 }
@@ -91,46 +92,44 @@ func IsValid(input string) bool {
 	return true
 }
 func LoadBanner(filename string) (map[rune][]string, error) {
-    file, err := os.ReadFile(filename)
-    if err != nil {
-        return nil, err
-    }
+	file, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
 
-    content := strings.ReplaceAll(string(file), "\r\n", "\n")
+	content := strings.ReplaceAll(string(file), "\r\n", "\n")
 
-    lines := strings.Split(content, "\n")
+	lines := strings.Split(content, "\n")
 
-    bannerMap := make(map[rune][]string)
-    currentChar := rune(32)
+	bannerMap := make(map[rune][]string)
+	currentChar := rune(32)
 
-    for i := 1; i < len(lines); i += 9 {
-        if i+8 > len(lines) {
-            break
-        }
-        bannerMap[currentChar] = lines[i : i+8]
-        currentChar++
-    }
+	for i := 1; i < len(lines); i += 9 {
+		if i+8 > len(lines) {
+			break
+		}
+		bannerMap[currentChar] = lines[i : i+8]
+		currentChar++
+	}
 
-    return bannerMap, nil
+	return bannerMap, nil
 }
-
 
 func PrintASCII(words []string, banner map[rune][]string) {
-    for _, word := range words {
-        if word == "" {
-            fmt.Println()
-            continue
-        }
+	for _, word := range words {
+		if word == "" {
+			fmt.Println()
+			continue
+		}
 
-        for row := 0; row < 8; row++ {
-            for _, char := range word {
-                charArt, exists := banner[char]
-                if exists {
-                    fmt.Print(charArt[row])
-                }
-            }
-            fmt.Println()
-        }
-    }
+		for row := 0; row < 8; row++ {
+			for _, char := range word {
+				charArt, exists := banner[char]
+				if exists {
+					fmt.Print(charArt[row])
+				}
+			}
+			fmt.Println()
+		}
+	}
 }
-
