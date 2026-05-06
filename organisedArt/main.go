@@ -7,29 +7,73 @@ import (
 )
 
 func main() {
-	inputText := os.Args
-	file, err := os.ReadFile(inputText[2])
+	input := os.Args[2]
+	if input == " " {
+		fmt.Println("Error")
+	}
+
+}
+
+func LoadBanner(filename string) (map[rune][]string, error) {
+	file, err := os.ReadFile(filename)
 	if err != nil {
-		fmt.Println("Error while reading file")
-		return
+		return nil, err
 	}
 
 	lines := strings.Split(string(file), "\n")
-	word := strings.Split(strings.ReplaceAll(inputText[1], "\\n", "\n"), "\n")
-	//replace := strings.ReplaceAll(lines[file[]], "\r\n", "\n")
-	for _, text := range word {
-		if text == "" {
-			fmt.Println()
+
+	bannerMap := make(map[rune][]string)
+
+	currentChar := rune(32)
+
+	for i := 1; i < len(lines); i += 9 {
+
+		if i+8 > len(lines) {
+
+			break
 		}
 
-		for start := 1; start <= 8; start++ {
-			for _, char := range text {
-				star := int(char-32)*9 + 1
+		bannerMap[currentChar] = lines[i : i+8]
 
-				fmt.Print(lines[star+start-1])
+		currentChar++
+	}
+
+	return bannerMap, nil
+}
+
+func ParseInput(input string) []string {
+
+	words := strings.Split(strings.ReplaceAll(input, "\\n", "\n"), "\n")
+
+	return words
+}
+
+func PrintASCII(words []string, banner map[rune][]string) {
+	for _, word := range words {
+		if word == "" {
+			fmt.Println()
+			continue
+		}
+
+		for row := 0; row < 8; row++ {
+			for _, char := range word {
+				charArt := banner[char]
+
+				fmt.Print(charArt[row])
 			}
 			fmt.Println()
 		}
 	}
+}
 
+func IsValid(input string) bool {
+	lines := strings.Split(input, " ")
+	for _, ch := range lines {
+
+		if ch == LoadBanner(input) {
+
+		}
+
+	}
+	return false
 }
