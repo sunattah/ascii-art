@@ -7,81 +7,47 @@ import (
 )
 
 func main() {
+
 	if len(os.Args) < 2 {
 		return
 	}
-	input := os.Args[1]
+	input := os.Args
 
-	if !IsValid(input) {
+	if input[1] == "" {
+		return
+	}
+
+
+	if !IsValid(input[1]) {
 		fmt.Println("Error: Invalid characters in input")
 		return
 	}
 
-	banner, err := LoadBanner("thinkertoy.txt")
+	file := "standard.txt"
+
+	if len(os.Args) > 2 {
+		file = os.Args[2]
+		if !strings.HasSuffix(file, ".txt") {
+			file = file+".txt"
+		}
+	}
+
+	banner, err := LoadBanner(file)
 	if err != nil {
 		fmt.Println("Error loading banner:", err)
 		return
 	}
-
-	words := ParseInput(input)
+	words := ParseInput(input[1])
 
 	PrintASCII(words, banner)
 }
 
-// func LoadBanner(filename string) (map[rune][]string, error) {
-// 	file, err := os.ReadFile(filename)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	lines := strings.Split(string(file), "\n")
-
-// 	bannerMap := make(map[rune][]string)
-
-// 	currentChar := rune(32)
-
-// 	for i := 1; i < len(lines); i += 9 {
-
-// 		if i+8 > len(lines) {
-
-// 			break
-// 		}
-
-// 		bannerMap[currentChar] = lines[i : i+8]
-
-// 		currentChar++
-// 	}
-
-// 	return bannerMap, nil
-// }
-
 func ParseInput(input string) []string {
-	text := strings.ReplaceAll(input, "\\n", "\n")
+	text := strings.Split(strings.ReplaceAll(input, "\\n", "\n"), "\n")
 
-	words := strings.Split(text, "\n")
+	return text
 
-	return words
 }
-
-// func PrintASCII(words []string, banner map[rune][]string) {
-// 	for _, word := range words {
-// 		if word == "" {
-// 			fmt.Println()
-// 			continue
-// 		}
-
-// 		for _, word := range words {
-// 			for row := 0; row < 8; row++ {
-// 				for _, char := range word {
-// 					charArt := banner[char]
-
-// 					fmt.Print(charArt[row])
-// 				}
-// 				fmt.Println()
-// 			}
-// 		}
-// 	}
-// }
 
 func IsValid(input string) bool {
 	for _, ch := range input {
@@ -97,37 +63,39 @@ func LoadBanner(filename string) (map[rune][]string, error) {
 		return nil, err
 	}
 
-	content := strings.ReplaceAll(string(file), "\r\n", "\n")
-
-	lines := strings.Split(content, "\n")
+	content := strings.Split(strings.ReplaceAll(string(file), "\r\n", "\n"), "\n")
 
 	bannerMap := make(map[rune][]string)
 	currentChar := rune(32)
 
-	for i := 1; i < len(lines); i += 9 {
-		if i+8 > len(lines) {
+	for i := 1; i < len(content); i += 9 {
+		if i+8 > len(content) {
 			break
 		}
-		bannerMap[currentChar] = lines[i : i+8]
+		bannerMap[currentChar] = content[i : i+8]
 		currentChar++
+	}
+	if len(bannerMap) != 95 {
+		return nil, fmt.Errorf("expected 95 characters, got %d", len(bannerMap))
 	}
 
 	return bannerMap, nil
 }
 
+
 func PrintASCII(words []string, banner map[rune][]string) {
-	for _, word := range words {
+	for i, word := range words {
 		if word == "" {
-			fmt.Println()
+			// Only skip the very last empty string produced by Split
+			if i < len(words)-1 {
+				fmt.Println()
+			}
 			continue
 		}
 
 		for row := 0; row < 8; row++ {
 			for _, char := range word {
-				charArt, exists := banner[char]
-				if exists {
-					fmt.Print(charArt[row])
-				}
+				fmt.Print(banner[char][row])
 			}
 			fmt.Println()
 		}
